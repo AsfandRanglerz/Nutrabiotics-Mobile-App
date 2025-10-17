@@ -1,0 +1,71 @@
+{
+  "project_info": {
+    "project_number": "227561691418",
+    "project_id": "nutrabiotics-48cef",
+    "storage_bucket": "nutrabiotics-48cef.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:227561691418:android:0df3327d081fc64feb34a3",
+        "android_client_info": {
+          "package_name": "com.nutrabiotics"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "227561691418-6qaic0h14oe8asuejugtvebq9sirb3t7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nutrabiotics",
+            "certificate_hash": "7815628e0990546c5ce56f33d590fd8901bf77f8"
+          }
+        },
+        {
+          "client_id": "227561691418-kujk3mj47ojob1i4g483s91aqupi8cbc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nutrabiotics",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "227561691418-qcb0e7091clstbmjij1tm50ordppoj49.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nutrabiotics",
+            "certificate_hash": "bcfe8dbfe3f5e47adc67ffaf8f9852fb213d7732"
+          }
+        },
+        {
+          "client_id": "227561691418-rr6o9kuprln57ate5mmasnsil3ocq7am.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nutrabiotics",
+            "certificate_hash": "6608b1eab510d6e2c9afc278d786d589d3bf912a"
+          }
+        },
+        {
+          "client_id": "227561691418-es1f0c2n6sjblqh0sti0eb7qnj764lc0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCNF8_Xg2E4PQAS6TPtRTq9366EBZ_qvCw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "227561691418-2tcncdd2cvsjutu53o6umdb2hkf6omuc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
