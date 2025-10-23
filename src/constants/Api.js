@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const domain = 'https://ranglerzbeta.in/nutrabiotics/';
+// const domain = 'https://ranglerzbeta.in/nutrabiotics/';
+const domain = 'https://admin.nutrabioticsapp.com/';
 const baseUrl = domain + 'api/';
 const Google_Map_API_Key = 'AIzaSyA5VajG6zbWb_yIBiO-WkUDbPvDMVL-1TQ';
 

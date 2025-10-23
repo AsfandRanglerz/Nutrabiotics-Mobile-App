@@ -18,7 +18,7 @@ export default function AboutUs() {
       <Header heading={'About Us'} />
       <WebView
         source={{
-          uri: 'https://ranglerzbeta.in/nutrabiotics/get-about-us',
+          uri: 'https://admin.nutrabioticsapp.com/get-about-us',
         }}
         containerStyle={styles.webviewContainer}
         startInLoadingState={true}

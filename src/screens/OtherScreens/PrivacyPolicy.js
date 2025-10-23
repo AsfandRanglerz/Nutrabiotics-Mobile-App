@@ -18,7 +18,7 @@ export default function PrivacyPolicy() {
       <Header heading={'Privacy Policy'} />
       <WebView
         source={{
-          uri: 'https://ranglerzbeta.in/nutrabiotics/get-privacy-policy',
+          uri: 'https://admin.nutrabioticsapp.com/get-privacy-policy',
         }}
         containerStyle={styles.webviewContainer}
         startInLoadingState={true}

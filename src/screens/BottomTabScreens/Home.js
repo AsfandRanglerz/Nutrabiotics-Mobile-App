@@ -95,7 +95,7 @@ const Home = () => {
           country,
         );
       } catch (err) {
-        console.log('Error:', err);
+        console.log('Error:', JSON.stringify(err));
       } finally {
         setIndicator(false);
         setTimeout(() => (loadingRef.current = false), 1500);

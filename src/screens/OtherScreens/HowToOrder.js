@@ -18,7 +18,7 @@ export default function HowToOrder() {
       <Header heading={'How To Order'} />
       <WebView
         source={{
-          uri: 'https://ranglerzbeta.in/nutrabiotics/howorder-show',
+          uri: 'https://admin.nutrabioticsapp.com/howorder-show',
         }}
         containerStyle={styles.webviewContainer}
         startInLoadingState={true}

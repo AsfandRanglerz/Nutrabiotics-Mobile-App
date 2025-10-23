@@ -18,7 +18,7 @@ export default function TermsConditions() {
       <Header heading={'Terms & Conditions'} />
       <WebView
         source={{
-          uri: 'https://ranglerzbeta.in/nutrabiotics/get-term-conditions',
+          uri: 'https://admin.nutrabioticsapp.com/get-term-conditions',
         }}
         containerStyle={styles.webviewContainer}
         startInLoadingState={true}
