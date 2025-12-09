@@ -91,9 +91,12 @@ const ProDetail = () => {
         if (res.status == 200) {
           console.log('@RESSS in product detail', res?.data);
           const product = res?.data?.product;
+          // const images = product?.photos?.map((item, index) => {
+          //   setStoreItem(item);
+          //   return { id: index, image: item?.photo };
+          // });
           const images = product?.photos?.map((item, index) => {
-            setStoreItem(item);
-            return { id: index, image: item?.photo };
+            return { id: index, photo: item?.photo }; // photo key correct
           });
           const percent = product?.product_details[0]?.d_per
             ? Number(product?.product_details[0]?.d_per)
@@ -103,21 +106,30 @@ const ProDetail = () => {
             pharmacy => pharmacy?.id,
           );
           setPharmacyIDs(near_pharmacy_ids);
-          setProduct({ ...product, d_per: percent, photos: images });
+          const updatedProduct = {
+            ...product,
+            photos: images, // only photos updated
+            d_per: percent,
+          };
+
+          setProduct(updatedProduct);
+          // setProduct({ ...product, d_per: percent, photos: images });
           setPharmacies(res?.data?.nearestPharmacy);
         }
       })
       .catch(err => console.log(err))
       .finally(() => setIndicator(false));
   };
-
+  console.log('@@@@', product);
   const favourite = () => {
+    if (!product) return;
+
     if (fav) {
       setFav(false);
-      dispatch(removeFromWishlist(storeItem));
+      dispatch(removeFromWishlist(product));
     } else {
       setFav(true);
-      dispatch(addToWishlist(storeItem));
+      dispatch(addToWishlist(product));
     }
   };
 
@@ -133,20 +145,10 @@ const ProDetail = () => {
         setFav(false);
       }
     }
-  }, [isFocused]);
+  }, [isFocused, wishlistData]);
 
   return (
     <View style={styles.container}>
-      {Platform.OS == 'ios' ? (
-        <View
-          style={{
-            height: useSafeAreaInsets()?.top,
-            width: wp(100),
-            backgroundColor: colors.primary,
-          }}
-        />
-      ) : null}
-
       {/* Location Modal */}
       <Modal style={styles.center} isVisible={modal}>
         <View style={styles.modalContainer}>

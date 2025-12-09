@@ -1,7 +1,7 @@
-import {Linking, Platform, StyleSheet, Text, View} from 'react-native';
-import React, {useEffect, useState} from 'react';
-import {NavigationContainer, useLinkTo} from '@react-navigation/native';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import { Linking, Platform, StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { NavigationContainer, useLinkTo } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import AuthRoutes from './AuthRoutes';
 import BottomTab from './BottomTab';
 import AllProducts from '../screens/OtherScreens/AllProducts';
@@ -10,10 +10,9 @@ import Coupens from '../screens/OtherScreens/Coupens';
 import ProDetail from '../screens/OtherScreens/ProDetail';
 import PharmacyProDetail from '../screens/OtherScreens/PharmacyProDetail';
 import ChangePassword from '../screens/OtherScreens/ChangePassword';
-import {configureDefaultHeaders} from '../constants/Api';
-import {useDispatch, useSelector} from 'react-redux';
+import { configureDefaultHeaders } from '../constants/Api';
+import { useDispatch, useSelector } from 'react-redux';
 import messaging from '@react-native-firebase/messaging';
-import ToastComponent from 'react-native-toast-message';
 import {
   addNewNotification,
   getAllNotifications,
@@ -26,6 +25,7 @@ import PrivacyPolicy from '../screens/OtherScreens/PrivacyPolicy';
 import TermsConditions from '../screens/OtherScreens/TermsConditions';
 import ExpiredModal from '../components/ExpiredModal';
 import AboutUs from '../screens/OtherScreens/AboutUs';
+import NotificationPermission from '../Utils/Permisions';
 
 let unsubscribeOnMessage,
   unsubscribeBackgroundMessageHandler,
@@ -47,6 +47,41 @@ const Routes = () => {
   const [expiredModal, setExpiredModal] = useState(false);
   const [expiredModalData, setExpiredModalData] = useState(null);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    const initNotifications = async () => {
+      if (!userData) return;
+      console.log('useefect');
+      // 1. Configure API headers
+      configureDefaultHeaders(userData?.token);
+      dispatch(getAllNotifications(userData?.id));
+
+      // 2. Request notification permission
+      const permissionStatus = await NotificationPermission();
+      console.log('Notification permission status:', permissionStatus);
+
+      if (
+        permissionStatus === 'granted' ||
+        permissionStatus === 'provisional'
+      ) {
+        // 3. Only if permission granted, setup listeners
+        listener();
+      } else {
+        console.log('Notifications not allowed');
+      }
+    };
+
+    initNotifications();
+
+    return () => {
+      // Clean up listeners
+      unsubscribeOnMessage && unsubscribeOnMessage();
+      unsubscribeBackgroundMessageHandler &&
+        unsubscribeBackgroundMessageHandler();
+      unsubscribeOnNotificationOpenedApp &&
+        unsubscribeOnNotificationOpenedApp();
+    };
+  }, [userData]);
 
   const formatNotificationData = notification => {
     let date = new Date(notification?.created_at);
@@ -173,28 +208,28 @@ const Routes = () => {
     );
     messaging().getInitialNotification().then(getInitialNotificationCallback);
   };
-
-  useEffect(() => {
-    if (userData) {
-      configureDefaultHeaders(userData?.token);
-      dispatch(getAllNotifications(userData?.id));
-    }
-    listener();
-    return () => {
-      unsubscribeOnMessage && unsubscribeOnMessage();
-      unsubscribeBackgroundMessageHandler &&
-        unsubscribeBackgroundMessageHandler();
-      unsubscribeOnNotificationOpenedApp &&
-        unsubscribeOnNotificationOpenedApp();
-    };
-  }, [userData]);
+  // useEffect(() => {
+  //   if (userData) {
+  //     configureDefaultHeaders(userData?.token);
+  //     dispatch(getAllNotifications(userData?.id));
+  //   }
+  //   listener();
+  //   return () => {
+  //     unsubscribeOnMessage && unsubscribeOnMessage();
+  //     unsubscribeBackgroundMessageHandler &&
+  //       unsubscribeBackgroundMessageHandler();
+  //     unsubscribeOnNotificationOpenedApp &&
+  //       unsubscribeOnNotificationOpenedApp();
+  //   };
+  // }, [userData]);
 
   return (
     <>
       <NavigationContainer linking={linking}>
         <Stack.Navigator
           initialRouteName="BottomTab"
-          screenOptions={{headerShown: false}}>
+          screenOptions={{ headerShown: false }}
+        >
           <Stack.Screen name="BottomTab" component={BottomTab} />
           <Stack.Screen name="AuthStack" component={AuthRoutes} />
           <Stack.Screen name="AllProducts" component={AllProducts} />

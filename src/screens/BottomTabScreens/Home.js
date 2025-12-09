@@ -47,6 +47,7 @@ import Geolocation, {
   getCurrentPosition,
 } from 'react-native-geolocation-service';
 import Geocoder from 'react-native-geocoding';
+import { NotificationPermission } from '../../Utils/Permisions';
 
 const Home = () => {
   Geocoder.init('AIzaSyA5VajG6zbWb_yIBiO-WkUDbPvDMVL-1TQ');
@@ -104,7 +105,12 @@ const Home = () => {
 
     fetchData();
   }, [isFocused, country]);
-
+  useEffect(() => {
+    getNotificationPermisison();
+  }, []);
+  const getNotificationPermisison = async () => {
+    const check = await NotificationPermission();
+  };
   useEffect(() => {
     fetchCountries();
   }, []);
@@ -237,10 +243,7 @@ const Home = () => {
       //   setProducts(products || []);
       // }
       if (res?.status === 200) {
-        console.log('@respo', res?.data);
-
         let products = [];
-
         // 🟢 Case 1: availableProducts
         if (res?.data?.availableProducts?.length > 0) {
           products = res.data.availableProducts
@@ -268,8 +271,6 @@ const Home = () => {
             })
             .filter(Boolean); // ✅ remove nulls
         }
-
-        console.log('@product', products);
         setProducts(products || []);
       }
     } catch (error) {
@@ -493,7 +494,6 @@ const Home = () => {
       </Pressable>
     </View>
   );
-
   return (
     <SafeAreaView style={[styles.container, styles.center]}>
       <ScrollView

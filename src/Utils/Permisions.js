@@ -1,119 +1,16 @@
-import { Linking, Alert, Platform } from 'react-native';
+import { Linking, Alert, Platform, PermissionsAndroid } from 'react-native';
 import { PERMISSIONS, request, RESULTS } from 'react-native-permissions';
+import messaging, { getMessaging } from '@react-native-firebase/messaging';
 
-// export const RequestGalleryPermission = async () => {
-//   const openSettings = () => {
-//     Linking.openSettings();
-//   };
+// Open App Settings
+const openAppSettings = () => {
+  Linking.openSettings().catch(() =>
+    console.warn('Unable to open app settings'),
+  );
+};
 
-//   let storageStatus;
-
-//   try {
-//     // Request permission to access external storage.
-
-//     if (Platform.OS === 'ios') {
-//       storageStatus = await request(PERMISSIONS.IOS.PHOTO_LIBRARY);
-//     } else if (Platform.OS == 'android' && Platform.Version >= 33) {
-//       storageStatus = await request(PERMISSIONS.ANDROID.READ_MEDIA_IMAGES);
-//     } else {
-//       storageStatus = await request(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE);
-//     }
-//     switch (storageStatus) {
-//       case RESULTS.GRANTED:
-//         // You can perform actions here that require the permission.
-//         return 'granted';
-
-//       case RESULTS.DENIED:
-//         // Handle the case where the user denied the permission.
-//         Alert.alert(
-//           'Permission Denied',
-//           'Please enable storage permissions manually in your device settings.',
-//           [
-//             {
-//               text: 'Open Settings',
-//               onPress: () => openSettings(),
-//               style: 'destructive',
-//             },
-//             {
-//               text: 'Cancel',
-//               style: 'cancel',
-//             },
-//           ],
-//         );
-//         return 'denied';
-
-//       case RESULTS.LIMITED:
-//         // Handle the case where the permission is granted but with limitations.
-//         Alert.alert(
-//           'Permission Limited',
-//           'Storage permission is granted but with limitations. Access to media images may be restricted.',
-//           [
-//             {
-//               text: 'Open Settings',
-//               onPress: () => openSettings(),
-//               style: 'destructive',
-//             },
-//             {
-//               text: 'Cancel',
-//               style: 'cancel',
-//             },
-//           ],
-//         );
-//         return 'limited';
-
-//       case RESULTS.BLOCKED:
-//         // Provide information to the user about how to enable the permission manually.
-//         Alert.alert(
-//           'Permission Blocked',
-//           'Storage permission is blocked. Please enable it in your device settings.',
-//           [
-//             {
-//               text: 'Open Settings',
-//               onPress: () => openSettings(),
-//               style: 'destructive',
-//             },
-//             {
-//               text: 'Cancel',
-
-//               style: 'cancel',
-//             },
-//           ],
-//         );
-//         return 'blocked';
-
-//       case RESULTS.UNAVAILABLE:
-//         // Handle the case where permission status is unavailable.
-//         Alert.alert(
-//           'Permission Unavailable',
-//           'Unable to determine storage permission status. Please try again later.',
-//           [
-//             {
-//               text: 'Open Settings',
-//               onPress: () => openSettings(),
-//               style: 'destructive',
-//             },
-//             {
-//               text: 'Cancel',
-//               style: 'cancel',
-//             },
-//           ],
-//         );
-//         return 'unavailable';
-
-//       default:
-//         return 'unknown';
-//     }
-//   } catch (error) {
-//     console.error('Error while requesting storage permission:', error);
-//     return 'error';
-//   }
-// };
-
+// ------------------ Location Permission ------------------
 export const LocationRequest = async () => {
-  const openSettings = () => {
-    Linking.openSettings();
-  };
-
   if (Platform.OS !== 'android' && Platform.OS !== 'ios') {
     Alert.alert(
       'Unsupported Platform',
@@ -131,31 +28,30 @@ export const LocationRequest = async () => {
       granted = await request(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE);
     }
 
-    if (granted === RESULTS.GRANTED) {
-      console.log('Location permission granted');
-      return 'granted';
-    } else if (granted === RESULTS.DENIED) {
+    if (granted === RESULTS.GRANTED) return 'granted';
+    if (granted === RESULTS.DENIED) {
       Alert.alert(
         'Permission Denied',
-        'Location permission is denied. Please enable it manually in your device settings.',
+        'Location permission is denied. Enable it in settings.',
         [
           {
             text: 'Open Settings',
-            onPress: openSettings,
+            onPress: openAppSettings,
             style: 'destructive',
           },
           { text: 'Cancel', style: 'cancel' },
         ],
       );
       return 'denied';
-    } else if (granted === RESULTS.BLOCKED) {
+    }
+    if (granted === RESULTS.BLOCKED) {
       Alert.alert(
         'Permission Blocked',
-        'Location permission is blocked. Please enable it manually in your device settings.',
+        'Location permission is blocked. Enable it in settings.',
         [
           {
             text: 'Open Settings',
-            onPress: openSettings,
+            onPress: openAppSettings,
             style: 'destructive',
           },
           { text: 'Cancel', style: 'cancel' },
@@ -166,7 +62,56 @@ export const LocationRequest = async () => {
 
     return 'unknown';
   } catch (error) {
-    console.error('Error while requesting location permission:', error);
+    console.error('Error requesting location permission:', error);
     return 'error';
+  }
+};
+
+// ------------------ Notification Permission ------------------
+export const NotificationPermission = async () => {
+  if (Platform.OS === 'android' && Platform.Version >= 33) {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+        {
+          title: 'Notification Permission',
+          message: 'App needs permission to send you notifications.',
+          buttonNeutral: 'Ask Me Later',
+          buttonNegative: 'Cancel',
+          buttonPositive: 'OK',
+        },
+      );
+
+      switch (granted) {
+        case PermissionsAndroid.RESULTS.GRANTED:
+          return 'granted';
+        case PermissionsAndroid.RESULTS.DENIED:
+        case PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN:
+          console.log('Notification permission denied or blocked');
+          openAppSettings();
+          return 'denied';
+        default:
+          return 'unknown';
+      }
+    } catch (err) {
+      console.warn('Notification permission request failed:', err);
+      openAppSettings();
+      return 'error';
+    }
+  } else {
+    // iOS & Android < 33
+    const status = await getMessaging().requestPermission();
+
+    switch (status) {
+      case messaging.AuthorizationStatus.AUTHORIZED:
+        return 'granted';
+      case messaging.AuthorizationStatus.PROVISIONAL:
+        console.log('Provisional notification permission granted');
+        return 'provisional';
+      default:
+        console.log('Notification permission disabled');
+        openAppSettings();
+        return 'denied';
+    }
   }
 };

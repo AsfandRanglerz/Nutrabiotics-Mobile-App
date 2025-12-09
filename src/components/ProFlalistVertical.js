@@ -20,14 +20,18 @@ const ProFlalistVertical = props => {
   return props.data?.length > 0 ? (
     <FlatList
       scrollEnabled={props.disableScroll ? false : true}
-      keyExtractor={(item, index) => index}
+      keyExtractor={(item, index) => index?.toString()}
       data={props.data}
       numColumns={2}
       showsVerticalScrollIndicator={false}
-      contentContainerStyle={{width: wp(90), padding: 3, paddingBottom: hp(20)}}
-      ListHeaderComponentStyle={{height: 10}}
+      contentContainerStyle={{
+        width: wp(90),
+        padding: 3,
+        paddingBottom: hp(20),
+      }}
+      ListHeaderComponentStyle={{ height: 10 }}
       ListHeaderComponent={<View />}
-      renderItem={({item, index}) => {
+      renderItem={({ item, index }) => {
         return (
           <ProductContainer
             key={item?.id}
@@ -43,7 +47,7 @@ const ProFlalistVertical = props => {
       }}
     />
   ) : (
-    <View style={{flex: 1, ...styles.center}}>
+    <View style={{ flex: 1, ...styles.center }}>
       {props?.indicator ? (
         <ActivityIndicator size={indicatorSize.m} color={colors.primary} />
       ) : (

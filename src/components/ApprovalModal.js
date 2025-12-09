@@ -1,15 +1,15 @@
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import React, {useState} from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useState } from 'react';
 import CustomButton from './CustomButton';
 import Modal from 'react-native-modal';
-import {colors, fontSize, fonts, wp} from '../constants/Constants';
-import {Icon} from '@rneui/themed';
-import {productRequests} from '../constants/Api';
+import { colors, fontSize, fonts, wp } from '../constants/Constants';
+import { Icon } from '@rneui/themed';
+import { productRequests } from '../constants/Api';
 import Toast from 'react-native-simple-toast';
-import {useDispatch} from 'react-redux';
-import {notificationSeen} from '../redux/actions/NotificationActions';
+import { useDispatch } from 'react-redux';
+import { notificationSeen } from '../redux/actions/NotificationActions';
 
-const ApprovalModal = ({modal, setModal, data}) => {
+const ApprovalModal = ({ modal, setModal, data }) => {
   const [indicator, setIndicator] = useState(false);
   const dispatch = useDispatch();
 
@@ -20,9 +20,8 @@ const ApprovalModal = ({modal, setModal, data}) => {
     productRequests
       .orderApprove(formData)
       .then(res => {
-        // console.log('resss',res)
         if (res.status == 200) {
-          Toast.show('Order Approved Successfully', Toast.SHORT);
+          Toast.show(res?.data?.message, Toast.SHORT);
           dispatch(notificationSeen(data?.id));
           setModal(false);
         } else {
@@ -30,7 +29,15 @@ const ApprovalModal = ({modal, setModal, data}) => {
         }
       })
       .catch(err => {
-        Toast.show('Failed to Approved Order', Toast.SHORT);
+        console.log('@ERR FULL', JSON.stringify(err, null, 2));
+
+        const errorMessage =
+          err?.response?.data?.message || // backend message
+          err?.response?.data?.error || // sometimes backend sends error
+          err?.message || // axios message
+          'Something went wrong';
+        console.log('@@@@@@', errorMessage);
+        Toast.show(errorMessage, Toast.SHORT);
       })
       .finally(() => setIndicator(false));
   };
@@ -56,7 +63,7 @@ const ApprovalModal = ({modal, setModal, data}) => {
           width={wp(40)}
           indicator={indicator}
           onPress={onPress}
-          containerStyle={{alignSelf: 'center', marginTop: 20}}
+          containerStyle={{ alignSelf: 'center', marginTop: 20 }}
         />
       </View>
     </Modal>

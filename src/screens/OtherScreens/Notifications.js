@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   colors,
   fonts,
@@ -17,11 +17,11 @@ import {
   wp,
 } from '../../constants/Constants';
 import Header from '../../components/Header';
-import {Icon} from '@rneui/themed';
-import {useFocusEffect, useNavigation} from '@react-navigation/native';
-import {SafeAreaView} from 'react-native';
-import {useDispatch, useSelector} from 'react-redux';
-import {notificationSeen} from '../../redux/actions/NotificationActions';
+import { Icon } from '@rneui/themed';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
+import { notificationSeen } from '../../redux/actions/NotificationActions';
 import ApprovalModal from '../../components/ApprovalModal';
 
 const Notifications = () => {
@@ -36,7 +36,6 @@ const Notifications = () => {
     }
     StatusBar.setBarStyle('dark-content');
   });
-
   return (
     <>
       <SafeAreaView style={styles.container}>
@@ -46,12 +45,12 @@ const Notifications = () => {
             data={notifications}
             keyExtractor={(item, index) => item?.id}
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={{width: wp(90)}}
-            ListHeaderComponentStyle={{height: 10}}
+            contentContainerStyle={{ width: wp(90) }}
+            ListHeaderComponentStyle={{ height: 10 }}
             ListHeaderComponent={<View />}
-            ListFooterComponentStyle={{height: 10}}
+            ListFooterComponentStyle={{ height: 10 }}
             ListFooterComponent={<View />}
-            renderItem={({item, index}) => {
+            renderItem={({ item, index }) => {
               return (
                 <TouchableOpacity
                   onPress={() => {
@@ -78,7 +77,8 @@ const Notifications = () => {
                         ? colors.openedNotificationBackgroundColor
                         : colors.notificationBackgroundColor,
                     },
-                  ]}>
+                  ]}
+                >
                   <Icon
                     type="material"
                     name={item?.seen ? 'drafts' : 'email'}
@@ -86,7 +86,7 @@ const Notifications = () => {
                     size={wp(8)}
                     style={styles.icon}
                   />
-                  <View style={{flex: 1}}>
+                  <View style={{ flex: 1 }}>
                     <View style={styles.firstCont}>
                       <Text numberOfLines={1} style={styles.title}>
                         {item?.title}
@@ -110,7 +110,7 @@ const Notifications = () => {
             }}
           />
         ) : (
-          <View style={{flex: 1, ...styles.center}}>
+          <View style={{ flex: 1, ...styles.center }}>
             <Text style={styles.txt}>No Data Found</Text>
           </View>
         )}

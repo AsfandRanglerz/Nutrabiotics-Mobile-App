@@ -1,7 +1,7 @@
-import {useFocusEffect, useNavigation} from '@react-navigation/native';
-import {useEffect, useRef, useState} from 'react';
-import {Image, Pressable, ScrollView, StyleSheet, View} from 'react-native';
-import {colors, wp} from '../constants/Constants';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useEffect, useRef, useState } from 'react';
+import { Image, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { colors, wp } from '../constants/Constants';
 
 let count = 0;
 let interval;
@@ -16,9 +16,9 @@ const Slider = props => {
     if (!props.disableAutoScroll) {
       interval = setInterval(() => {
         if (count < arrayLength - 1) {
-          props.scrollRef?.current?.scrollTo({x: width * (count + 1)});
+          props.scrollRef?.current?.scrollTo({ x: width * (count + 1) });
         } else {
-          props.scrollRef?.current?.scrollTo({x: 0, animated: false});
+          props.scrollRef?.current?.scrollTo({ x: 0, animated: false });
         }
       }, 5000);
     }
@@ -47,7 +47,8 @@ const Slider = props => {
           const index = Math.round(xOffset / width);
           count = index;
           if (index != focusedIndex) setFocusedIndex(index);
-        }}>
+        }}
+      >
         {props.data?.map((item, index) => {
           return (
             <Pressable
@@ -58,12 +59,13 @@ const Slider = props => {
               style={[
                 styles.bannerImage,
                 props.imageStyle?.height
-                  ? {height: props.imageStyle?.height}
+                  ? { height: props.imageStyle?.height }
                   : null,
                 styles.center,
-              ]}>
+              ]}
+            >
               <Image
-                source={{uri: item?.image}}
+                source={{ uri: item?.photo || item?.image }}
                 style={[styles.bannerImage, props.imageStyle]}
                 resizeMode={
                   props.imageResizeMode ? props.imageResizeMode : 'contain'
@@ -74,7 +76,8 @@ const Slider = props => {
         })}
       </ScrollView>
       <View
-        style={{flexDirection: 'row', ...styles.center, paddingVertical: 10}}>
+        style={{ flexDirection: 'row', ...styles.center, paddingVertical: 10 }}
+      >
         {props.data?.length > 1 ? (
           props.data?.map((item, index) => {
             return (
@@ -82,14 +85,14 @@ const Slider = props => {
                 key={item?.id}
                 style={[
                   focusedIndex == index
-                    ? {...styles.activeDot, ...props.activeDotStyle}
-                    : {...styles.dot, ...props.dotStyle},
+                    ? { ...styles.activeDot, ...props.activeDotStyle }
+                    : { ...styles.dot, ...props.dotStyle },
                 ]}
               />
             );
           })
         ) : (
-          <View style={{height: wp(3)}} />
+          <View style={{ height: wp(3) }} />
         )}
       </View>
     </View>

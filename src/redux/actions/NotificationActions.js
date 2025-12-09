@@ -1,4 +1,4 @@
-import {productRequests} from '../../constants/Api';
+import { productRequests } from '../../constants/Api';
 import ActionTypes from '../ActionTypes';
 
 const getAllNotifications = id => dispatch => {
@@ -14,20 +14,26 @@ const getAllNotifications = id => dispatch => {
             date = `${date.getDate()}-${
               date.getMonth() + 1
             }-${date.getFullYear()}`;
+            const sendItem = JSON.parse(item?.body);
             const body = item?.body ? JSON.parse(item?.body) : {};
+            const product = body.products?.[0] || {}; // get first product if exists
             return {
               id: item?.id,
               date,
+              couponCode: sendItem?.code,
               title: item?.title,
-              productId: body?.product_id,
-              productName: body?.product_name,
-              productDiscountPer: body?.d_per,
-              productDiscountPrice: body?.d_price,
-              productPrice: body?.price,
-              seen: item?.seen == 1 ? true : false,
+              productId: product?.product_id,
+              pharmacyName: sendItem?.pharmacy_name,
+              productName: product?.product_name,
+              productDiscountPer: product?.d_per,
+              productDiscountPrice: product?.d_price,
+              productPrice: product?.price,
+              seen: item?.seen == 1,
+              orderId: sendItem?.order_id,
               description: body,
             };
           }) || [];
+
         dispatch({
           type: ActionTypes.get_all_notifications,
           payload: data,
@@ -47,12 +53,12 @@ const addNewNotification = data => {
 const notificationSeen = id => dispatch => {
   productRequests
     .notificationSeen(id)
-    .then(res => {})
-    .catch(err => console.log(err));
+    .then(res => console.log('@resss', res))
+    .catch(err => console.log('@@@', err));
   dispatch({
     type: ActionTypes.notification_seen,
     payload: id,
   });
 };
 
-export {getAllNotifications, addNewNotification, notificationSeen};
+export { getAllNotifications, addNewNotification, notificationSeen };

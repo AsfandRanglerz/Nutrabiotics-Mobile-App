@@ -6,11 +6,11 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
-import {colors, fonts, fontSize, wp} from '../constants/Constants';
-import {Icon} from '@rneui/themed';
-import {useNavigation} from '@react-navigation/native';
-import {useDispatch, useSelector} from 'react-redux';
+import React, { useEffect, useState } from 'react';
+import { colors, fonts, fontSize, wp } from '../constants/Constants';
+import { Icon } from '@rneui/themed';
+import { useNavigation } from '@react-navigation/native';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   addToWishlist,
   removeFromWishlist,
@@ -21,6 +21,13 @@ const ProductContainer = props => {
   const dispatch = useDispatch();
   const [fav, setFav] = useState(false);
   const discountPercent = Number(props.item?.product_details?.[0]?.d_per) || 0;
+  const wishlistData = useSelector(state => state.WishlistReducer);
+
+  useEffect(() => {
+    if (!props?.item) return; // <-- Prevent invalid renders
+    const isFav = wishlistData?.some(it => it.id === props.item.id);
+    setFav(isFav);
+  }, [wishlistData, props?.item]);
   const favourite = () => {
     if (fav) {
       setFav(false);
@@ -30,14 +37,15 @@ const ProductContainer = props => {
       dispatch(addToWishlist(props.item));
     }
   };
-  useEffect(() => {
-    setFav(props.item.fav);
-  }, [props?.item]);
+  // useEffect(() => {
+  //   setFav(props.item.fav);
+  // }, [props?.item]);
 
   return (
     <Pressable
-      onPress={() => navigation.navigate('ProDetail', {id: props?.item?.id})}
-      style={[styles.container, {...props.containerStyle}]}>
+      onPress={() => navigation.navigate('ProDetail', { id: props?.item?.id })}
+      style={[styles.container, { ...props.containerStyle }]}
+    >
       {/* Off Container */}
       {discountPercent > 0 ? (
         <View style={styles.offCont}>
@@ -52,8 +60,9 @@ const ProductContainer = props => {
         onPress={favourite}
         style={[
           styles.favCont,
-          {borderColor: fav ? colors.primary : colors.grey},
-        ]}>
+          { borderColor: fav ? colors.primary : colors.grey },
+        ]}
+      >
         <Icon
           type={'material'}
           name={'favorite'}
@@ -64,7 +73,7 @@ const ProductContainer = props => {
       <Image
         source={
           props.item?.photos && props.item?.photos[0]?.photo
-            ? {uri: props.item?.photos[0]?.photo}
+            ? { uri: props.item?.photos[0]?.photo }
             : require('../assets/images/default-image-white.png')
         }
         style={styles.image}
@@ -73,14 +82,7 @@ const ProductContainer = props => {
       <Text style={styles.title} numberOfLines={2}>
         {props.item?.product_name}
       </Text>
-      <View
-        style={{
-          marginTop: wp(1),
-          flexDirection: 'row',
-          alignItems: 'center',
-          flex: 1,
-          overflow: 'hidden',
-        }}>
+      <View style={styles.productPrice}>
         <Text
           numberOfLines={1}
           style={[
@@ -91,7 +93,8 @@ const ProductContainer = props => {
                   color: colors.darkGrey,
                 }
               : null,
-          ]}>
+          ]}
+        >
           {props?.item?.product_details &&
             props?.item?.product_details[0]?.currency}{' '}
           {Number(
@@ -102,7 +105,7 @@ const ProductContainer = props => {
             .replace(/.00$/, '')}
         </Text>
         {discountPercent > 0 ? (
-          <Text numberOfLines={1} style={[styles.price, {marginLeft: 5}]}>
+          <Text numberOfLines={1} style={[styles.price, { marginLeft: 5 }]}>
             {Number(
               props?.item?.product_details &&
                 props?.item?.product_details[0]?.d_price,
@@ -113,8 +116,11 @@ const ProductContainer = props => {
         ) : null}
       </View>
       <TouchableOpacity
-        onPress={() => navigation.navigate('ProDetail', {id: props?.item?.id})}
-        style={styles.detailBtn}>
+        onPress={() =>
+          navigation.navigate('ProDetail', { id: props?.item?.id })
+        }
+        style={styles.detailBtn}
+      >
         <Text style={styles.btnTxt}>See Details</Text>
       </TouchableOpacity>
     </Pressable>
@@ -132,7 +138,7 @@ const styles = StyleSheet.create({
     padding: wp(2),
     backgroundColor: colors.white,
     elevation: 2,
-    shadowOffset: {width: 1, height: 2},
+    shadowOffset: { width: 1, height: 2 },
     shadowColor: '#171717',
     shadowOpacity: 0.2,
     shadowRadius: 2,
@@ -194,5 +200,12 @@ const styles = StyleSheet.create({
     color: colors.white,
     fontFamily: fonts.medium,
     fontSize: fontSize.xs,
+  },
+  productPrice: {
+    marginTop: wp(1),
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    overflow: 'hidden',
   },
 });

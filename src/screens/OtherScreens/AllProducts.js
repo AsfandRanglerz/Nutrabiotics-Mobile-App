@@ -142,28 +142,28 @@ const AllProducts = () => {
 
   const [indicator, setIndicator] = useState(true);
   const [data, setData] = useState(params?.data ? [...params.data] : []);
+  // const [data, setData] = useState([]);
 
   // ✅ StatusBar setup
   useEffect(() => {
     if (Platform.OS === 'android') StatusBar.setBackgroundColor(colors.bg);
     StatusBar.setBarStyle('dark-content');
   }, []);
-  console.log('@PARAMA AAAA', params);
 
-  // ✅ API request
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setIndicator(true);
+        setIndicator(true); // ← LOADER START HERE
         const formData = new FormData();
-        // ---------------------- POPULAR SECTION ----------------------
+
+        // POPULAR PRODUCTS
         if (params?.heading === 'Popular') {
           if (params?.location) {
             formData.append('latitude', params.location.latitude);
             formData.append('longitude', params.location.longitude);
           }
           formData.append('country', params?.country);
-          console.log('@ POPULAR FORM DATA', formData);
+
           const res = await productRequests.populars(formData);
           if (res?.status === 200) {
             const arr = res?.data?.availableProducts?.map(item => {
@@ -173,17 +173,15 @@ const AllProducts = () => {
                 fav: wishlistData?.some(it => it.id === product.id),
               };
             });
-            console.log('@DATA ki array', arr);
             setData(arr);
           }
           return;
         }
 
-        // ---------------------- OTHER PRODUCTS SECTION ----------------------
+        // OTHER PRODUCTS
         formData.append('subcategory_id', params?.id);
         formData.append('country', params?.country);
 
-        // ✅ Sirf tab lat/long add karo jab available ho
         if (params?.location?.latitude && params?.location?.longitude) {
           formData.append('latitude', params.location.latitude);
           formData.append('longitude', params.location.longitude);
@@ -193,18 +191,14 @@ const AllProducts = () => {
 
         let allProducts = [];
 
-        // ✅ Agar products array direct milti hai (lat/long nahi gaye)
         if (res?.data?.products?.length) {
           allProducts = res.data.products;
-        }
-        // ✅ Warna pharmaciesWithProducts se nikaalo
-        else if (res?.data?.pharmaciesWithProducts?.length) {
+        } else if (res?.data?.pharmaciesWithProducts?.length) {
           res.data.pharmaciesWithProducts.forEach(pharmacy => {
             pharmacy?.products?.forEach(product => allProducts.push(product));
           });
         }
 
-        // ✅ Wishlist mapping
         if (res?.status === 200) {
           const arr = allProducts.map(item => ({
             ...item,
@@ -215,23 +209,12 @@ const AllProducts = () => {
       } catch (err) {
         console.log('API Error:', err);
       } finally {
-        setIndicator(false);
+        setIndicator(false); // ← LOADER STOP HERE
       }
     };
 
     fetchData();
   }, []);
-
-  // ✅ Update wishlist favs on focus
-  useEffect(() => {
-    if (isFocused && data.length > 0) {
-      const updated = data.map(item => ({
-        ...item,
-        fav: wishlistData?.some(it => it.id === item.id),
-      }));
-      setData(updated);
-    }
-  }, [isFocused]);
 
   return (
     <SafeAreaView style={styles.container}>

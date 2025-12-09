@@ -33,13 +33,9 @@ const Deals = () => {
       formData.append('country', location.country);
     }
 
-    console.log('@FORMDATA in deal', formData);
-
     productRequests
       .deals(formData)
       .then(res => {
-        console.log('@DEAL IN RESPONSE', res?.data);
-
         let allProducts = [];
 
         // 🟢 Case 1: If response contains pharmacies with products
@@ -76,41 +72,6 @@ const Deals = () => {
       .finally(() => setIndicator(false));
   };
 
-  // const getData = () => {
-  //   const formData = new FormData();
-  //   formData.append('latitude', location?.latitude);
-  //   formData.append('longitude', location?.longitude);
-  //   formData.append('country', location?.country);
-  //   console.log('@FORMDAYA in deal', formData);
-  //   productRequests
-  //     .deals(formData)
-  //     .then(res => {
-  //       let allProducts = [];
-  //       res?.data.pharmaciesWithProducts.forEach(pharmacy => {
-  //         pharmacy.products.forEach(product => {
-  //           allProducts.push(product);
-  //         });
-  //       });
-  //       if (res.status == 200) {
-  //         // const arr = res?.data?.successData?.map(item => {
-  //         const arr = allProducts?.map(item => {
-  //           if (wishlistData?.find(it => it.id == item.id)) {
-  //             item.fav = true;
-  //           } else {
-  //             item.fav = false;
-  //           }
-  //           return { ...item };
-  //         });
-  //         arr.sort(
-  //           (a, b) =>
-  //             b?.product_details?.[0]?.d_per - a?.product_details?.[0]?.d_per,
-  //         );
-  //         setData(arr || []);
-  //       }
-  //     })
-  //     .catch(err => console.log(err))
-  //     .finally(() => setIndicator(false));
-  // };
   useEffect(() => {
     getData();
   }, [isFocused]);

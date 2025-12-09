@@ -9,23 +9,23 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
-import {colors, fonts, fontSize, wp} from '../../constants/Constants';
+import React, { useEffect, useState } from 'react';
+import { colors, fonts, fontSize, wp } from '../../constants/Constants';
 import Header from '../../components/Header';
-import {useFocusEffect, useNavigation} from '@react-navigation/native';
-import {Icon} from '@rneui/themed';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { Icon } from '@rneui/themed';
 import InputField from '../../components/InputField';
 import KeyboardResponsiveModal from '../../components/KeyboardResponsiveModal';
 import CustomButton from '../../components/CustomButton';
-import {launchImageLibrary} from 'react-native-image-picker';
-import {SafeAreaView} from 'react-native';
-import {authRequests, productRequests} from '../../constants/Api';
-import {ActivityIndicator} from 'react-native';
+import { launchImageLibrary } from 'react-native-image-picker';
+import { SafeAreaView } from 'react-native';
+import { authRequests, productRequests } from '../../constants/Api';
+import { ActivityIndicator } from 'react-native';
 import Toast from 'react-native-simple-toast';
-import {useDispatch, useSelector} from 'react-redux';
-import {addUpdateUser} from '../../redux/actions/UserActions';
+import { useDispatch, useSelector } from 'react-redux';
+import { addUpdateUser } from '../../redux/actions/UserActions';
 import DropDown from '../../components/DropDown';
-import {GoogleSignin} from '@react-native-google-signin/google-signin';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
 const CustomView = props => {
   return (
@@ -95,6 +95,13 @@ const Profile = () => {
     StatusBar.setBarStyle('dark-content');
   });
 
+  useEffect(() => {
+    GoogleSignin.configure({
+      webClientId:
+        '227561691418-2tcncdd2cvsjutu53o6umdb2hkf6omuc.apps.googleusercontent.com', // Firebase Web Client ID
+      offlineAccess: true,
+    });
+  }, []);
   const imagePick = async () => {
     launchImageLibrary(
       {
@@ -115,43 +122,76 @@ const Profile = () => {
     );
   };
 
+  // const logout = async () => {
+  //   setLogoutIndicator(true);
+  //   const isGoogleSignedIn = await GoogleSignin.isSignedIn();
+  //   if (isGoogleSignedIn) {
+  //     await GoogleSignin.revokeAccess();
+  //     await GoogleSignin.signOut();
+  //     authRequests
+  //       .logout()
+  //       .then(res => {
+  //         Toast.show(res?.data?.message, Toast.SHORT);
+  //         if (res.status == 200) {
+  //           dispatch(addUpdateUser(null));
+  //           navigation.navigate('Home');
+  //         }
+  //       })
+  //       .catch(err => {
+  //         if (err?.response?.data?.message)
+  //           Toast.show(err?.response?.data?.message, Toast.SHORT);
+  //       })
+  //       .finally(() => setLogoutIndicator(false));
+  //   } else {
+  //     authRequests
+  //       .logout()
+  //       .then(res => {
+  //         Toast.show(res?.data?.message, Toast.SHORT);
+  //         if (res.status == 200) {
+  //           dispatch(addUpdateUser(null));
+  //           navigation.navigate('Home');
+  //         }
+  //       })
+  //       .catch(err => {
+  //         if (err?.response?.data?.message)
+  //           Toast.show(err?.response?.data?.message, Toast.SHORT);
+  //       })
+  //       .finally(() => setLogoutIndicator(false));
+  //   }
+  // };
   const logout = async () => {
-    setLogoutIndicator(true);
-    const isGoogleSignedIn = await GoogleSignin.isSignedIn();
-    if (isGoogleSignedIn) {
-      await GoogleSignin.revokeAccess();
-      await GoogleSignin.signOut();
-      authRequests
-        .logout()
-        .then(res => {
-          Toast.show(res?.data?.message, Toast.SHORT);
-          if (res.status == 200) {
-            dispatch(addUpdateUser(null));
-            navigation.navigate('Home');
-          }
-        })
-        .catch(err => {
-          if (err?.response?.data?.message)
-            Toast.show(err?.response?.data?.message, Toast.SHORT);
-        })
-        .finally(() => setLogoutIndicator(false));
-    } else {
-      authRequests
-        .logout()
-        .then(res => {
-          Toast.show(res?.data?.message, Toast.SHORT);
-          if (res.status == 200) {
-            dispatch(addUpdateUser(null));
-            navigation.navigate('Home');
-          }
-        })
-        .catch(err => {
-          if (err?.response?.data?.message)
-            Toast.show(err?.response?.data?.message, Toast.SHORT);
-        })
-        .finally(() => setLogoutIndicator(false));
+    try {
+      setLogoutIndicator(true);
+
+      const isGoogleSignedIn = (await GoogleSignin.isSignedIn?.()) || false;
+
+      if (isGoogleSignedIn) {
+        try {
+          await GoogleSignin.revokeAccess();
+          await GoogleSignin.signOut();
+        } catch (googleErr) {
+          console.log('Google Signout Error: ', googleErr);
+        }
+      }
+
+      const res = await authRequests.logout();
+      Toast.show(res?.data?.message || 'Logged out', Toast.SHORT);
+
+      if (res.status === 200) {
+        dispatch(addUpdateUser(null));
+        navigation.navigate('Home');
+      }
+    } catch (err) {
+      console.log('Logout Error:', err);
+      Toast.show(
+        err?.response?.data?.message || 'Something went wrong!',
+        Toast.SHORT,
+      );
+    } finally {
+      setLogoutIndicator(false);
     }
   };
+
   const updateProfile = () => {
     setUpdateIndicator(true);
     const formData = new FormData();
@@ -191,21 +231,23 @@ const Profile = () => {
   useEffect(() => {
     setImage(null);
   }, [modal]);
-
   return (
     <SafeAreaView style={[styles.container, styles.center]}>
       {/* Edit Profile modal */}
       <KeyboardResponsiveModal
         isVisible={modal}
         onBackButtonPress={() => setModal(false)}
-        onBackdropPress={() => setChangeFocus(!changeFocus)}>
+        onBackdropPress={() => setChangeFocus(!changeFocus)}
+      >
         <Pressable
           onPress={() => setChangeFocus(!changeFocus)}
-          style={styles.modalCont}>
+          style={styles.modalCont}
+        >
           {/* Cross Button */}
           <TouchableOpacity
             style={styles.cross}
-            onPress={() => setModal(false)}>
+            onPress={() => setModal(false)}
+          >
             <Icon
               type={'material'}
               name={'close'}
@@ -219,15 +261,16 @@ const Profile = () => {
                 borderRadius: styles.profileImgEdit.borderRadius,
                 marginVertical: wp(7),
                 alignSelf: 'center',
-              }}>
+              }}
+            >
               <View style={styles.profileImgEditView}>
                 <Image
                   resizeMode="contain"
                   source={
                     image
-                      ? {uri: image.uri}
+                      ? { uri: image.uri }
                       : userData?.image
-                      ? {uri: userData?.image}
+                      ? { uri: userData?.image }
                       : require('../../assets/images/dummy-profile.png')
                   }
                   style={styles.profileImgEdit}
@@ -236,7 +279,8 @@ const Profile = () => {
               {/* Camera Icon */}
               <TouchableOpacity
                 onPress={imagePick}
-                style={[styles.cross, {top: -5, right: -5}]}>
+                style={[styles.cross, { top: -5, right: -5 }]}
+              >
                 <Icon
                   type={'material'}
                   name={'photo-camera'}
@@ -250,7 +294,7 @@ const Profile = () => {
                 width: wp(90) - 20,
                 marginBottom: wp(7),
               }}
-              inputContainerStyle={{width: wp(90) - 30}}
+              inputContainerStyle={{ width: wp(90) - 30 }}
               changeFocus={changeFocus}
               heading={'Name'}
               value={name}
@@ -294,7 +338,7 @@ const Profile = () => {
             /> */}
           </ScrollView>
           <CustomButton
-            containerStyle={{marginVertical: 10}}
+            containerStyle={{ marginVertical: 10 }}
             buttonText={'Update'}
             width={wp(30)}
             onPress={updateProfile}
@@ -304,8 +348,9 @@ const Profile = () => {
       </KeyboardResponsiveModal>
 
       <ScrollView
-        contentContainerStyle={[styles.center, {paddingBottom: wp(25)}]}
-        showsVerticalScrollIndicator={false}>
+        contentContainerStyle={[styles.center, { paddingBottom: wp(25) }]}
+        showsVerticalScrollIndicator={false}
+      >
         <Header heading={'Profile'} hideBackButton={true} />
         <View style={styles.headingCont}>
           <View style={styles.profileImgView}>
@@ -314,7 +359,7 @@ const Profile = () => {
               style={styles.profileImg}
               source={
                 userData?.image
-                  ? {uri: userData?.image}
+                  ? { uri: userData?.image }
                   : require('../../assets/images/dummy-profile.png')
               }
             />
@@ -324,7 +369,7 @@ const Profile = () => {
             <Text style={styles.email}>{userData?.email}</Text>
           </View>
         </View>
-        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <Icon
             name={'flag'}
             type={'material'}
@@ -432,7 +477,7 @@ const styles = StyleSheet.create({
     marginVertical: 20,
     marginTop: 15,
     marginLeft: 5,
-    transform: [{translateY: 2}],
+    transform: [{ translateY: 2 }],
   },
   btn: {
     padding: wp(3),
